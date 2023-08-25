@@ -1,0 +1,9 @@
+<div>
+    <h1>Task List</h1>
+    <hr/>
+        <div class="row">
+            <div *ngFor="let task of tasks" class="col-md-5">
+                <task-thumbnail [task] = task></task-thumbnail>
+            </div>
+        </div>
+</div>

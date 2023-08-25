@@ -1,0 +1,12 @@
+<div [routerLink]="['/tasks', task.taskId]" class="well howerwell thumnail">
+    <h2>{{task.title}}</h2>
+    <div>Category: {{task.category?.categoryName}} </div>
+    <div>Status: {{task.status?.statusName}} </div>
+    <div>Date: {{task.date | date:'short'}}</div>
+    <div>
+        Description:
+        <div style="margin-left: 20px;">
+            {{task.description.length > 50 ? (task.description | slice:0:50) + '...' : task.description}}
+        </div>
+    </div>
+</div>

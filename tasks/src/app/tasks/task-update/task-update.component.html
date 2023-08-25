@@ -1,0 +1,30 @@
+<h1>{{task?.title}}</h1>
+<hr>
+<div class="col-md-4">
+<form [formGroup]="taskForm" (ngSubmit)="update(taskForm.value)">
+    <div class="form-group">
+      <label  for="title">Title:</label>
+      <input id="title" formControlName="title" type="text" name="title" class="form-control" required placeholder="Title...">
+    </div>
+    <div>
+      <label for="description">Description</label>
+      <textarea id="description" formControlName="description" type="text" name="description" class="form-control" required placeholder="Description..."></textarea>
+    </div>
+    <div>
+      <label for="categoryId">Category</label>
+      <select id="categoryId" formControlName="categoryId" type="text" name="categoryId" class="form-control" placeholder="Category...">
+        <option *ngFor="let category of categories" [value]="category.categoryId">{{ category.categoryName }}</option>
+      </select>
+    </div>
+    <div>
+      <label for="statusId">Status</label>
+      <select id="statusId" formControlName="statusId" type="text" name="statusId" class="form-control" placeholder="Status...">
+        <option *ngFor="let status of statuses" [value]="status.statusId">{{ status.statusName }}</option>
+      </select>
+    </div>
+    <hr>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-default" (click)="cancel()">Cancel</button>
+    <button type="button" class="btn btn-default" (click)="changes()" style="float: right;">Changes</button>
+  </form>
+</div>
