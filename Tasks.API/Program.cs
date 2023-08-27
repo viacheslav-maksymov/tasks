@@ -62,8 +62,14 @@ builder.Services.AddAuthentication("Bearer")
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins",
-        builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    options.AddPolicy("MyAngularAppPolicy",
+        corsPolicy =>
+        {
+            corsPolicy.WithOrigins(builder.Configuration["WebApplicationSettings:Url"])
+                   .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowCredentials();
+        });
 });
 
 var app = builder.Build();
@@ -77,7 +83,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAllOrigins");
+app.UseCors("MyAngularAppPolicy");
 
 app.UseRouting();
 
