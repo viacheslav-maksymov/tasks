@@ -37,7 +37,7 @@ namespace Tasks.API.Controllers
                 IEnumerable<TaskCategoryEntity> taskCategoryEntities = await this.repository.GetCategoriesAsync();
 
                 return this.Ok(this.mapper.Map<IEnumerable<TaskCategoryDto>>(taskCategoryEntities));
-            });
+            }, this.logger);
 
         [HttpGet("{id}")]
         public async Task<ActionResult<TaskCategoryDto>> GetTaskCategory(int id)
@@ -49,7 +49,6 @@ namespace Tasks.API.Controllers
                     return this.NotFound();
 
                 return this.Ok(this.mapper.Map<TaskCategoryDto>(taskCategoryEntity));
-            });
-
+            }, this.logger);
     }
 }

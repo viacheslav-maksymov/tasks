@@ -106,7 +106,7 @@ namespace Tasks.API.Controllers
                 IEnumerable<TaskEntity> taskEntitites = await this.repository.GetTasksByUserAsync(currentUserId);
 
                 return this.Ok(this.mapper.Map<IEnumerable<TaskDto>>(taskEntitites));
-            });
+            }, this.logger);
 
         [HttpGet("tasks/{id}", Name = "GetTask")]
         public async Task<ActionResult<TaskDto>> GetTask(int id)
@@ -122,7 +122,7 @@ namespace Tasks.API.Controllers
                     return this.Forbid();
 
                 return this.Ok(this.mapper.Map<TaskDto>(taskEntity));
-            });
+            }, this.logger);
 
         [HttpGet("taskStatus/{statusId}/tasks")]
         public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasksByStatus(int statusId)
@@ -138,11 +138,12 @@ namespace Tasks.API.Controllers
                     return this.NotFound();
 
                 return this.Ok(this.mapper.Map<IEnumerable<TaskDto>>(taskWithStatus));
-            });
+            }, this.logger);
 
         [HttpPut("tasks/{id}")]
         public async Task<ActionResult> UpdateTask(int id, TaskUpdateDto task)
-        {
+            => await this.HandleRequestAsync(async () =>
+            {
             if (!await this.repository.IsTaskExistAsync(id))
                 return this.NotFound();
 
@@ -166,6 +167,6 @@ namespace Tasks.API.Controllers
                 this.logger.LogError($"Task update log not saved.\n{taskEntity.TaskId}");
 
             return this.NoContent();
-        }
+        }, this.logger);
     }
 }

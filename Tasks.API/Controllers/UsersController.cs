@@ -58,15 +58,16 @@ namespace Tasks.API.Controllers
         [Authorize]
         [HttpGet()]
         public async Task<ActionResult<UserDto>> GetUser()
-        {
-            int currentUserId = this.GetClaimUserIdValue();
+             => await this.HandleRequestAsync(async () =>
+             {
+                int currentUserId = this.GetClaimUserIdValue();
 
-            UserEntity userEntity = await this.repository.GetUserAsync(currentUserId);
+                UserEntity userEntity = await this.repository.GetUserAsync(currentUserId);
 
-            if (userEntity is null)
-                return this.NotFound();
+                if (userEntity is null)
+                    return this.NotFound();
 
-            return this.Ok(this.mapper.Map<UserDto>(userEntity));
-        }
+                return this.Ok(this.mapper.Map<UserDto>(userEntity));
+            }, this.logger);
     }
 }

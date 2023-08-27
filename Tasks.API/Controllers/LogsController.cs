@@ -52,6 +52,6 @@ namespace Tasks.API.Controllers
                 List<TaskUpdateLog> logs = await this.repository.GetTaskUpdateLogsByTaskAsync(taskId);
 
                 return this.Ok(this.mapper.Map<IEnumerable<TaskUpdateLogDto>>(logs));
-            });
+            }, this.logger);
     }
 }
