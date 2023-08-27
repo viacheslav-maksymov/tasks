@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Tasks.API.Controllers.Authentication;
 using Tasks.API.Helpers;
 using Tasks.API.Models.Logs;
-using Tasks.API.Models.Task;
 using Tasks.Data.Interfaces;
 using Tasks.Data.Models;
 using Tasks.Log.Interfaces;
@@ -13,6 +13,7 @@ namespace Tasks.API.Controllers
 {
     [ApiController]
     [Authorize]
+    [TypeFilter(typeof(ValdiateUserIdFilter))]
     [Route("api")]
     public sealed class LogsController : ControllerBase
     {
@@ -41,6 +42,12 @@ namespace Tasks.API.Controllers
             {
                 if (!await this.taskRepository.IsTaskExistAsync(taskId))
                     return this.NotFound();
+
+                int currentUserId = this.GetClaimUserIdValue();
+                TaskEntity task = await this.taskRepository.GetTaskAsync(taskId);
+
+                if (task.UserId != currentUserId)
+                    return this.Forbid();
 
                 List<TaskUpdateLog> logs = await this.repository.GetTaskUpdateLogsByTaskAsync(taskId);
 

@@ -7,5 +7,7 @@ namespace Tasks.Data.Interfaces
         Task<TaskCategoryEntity?> GetTaskCategoryAsync(int id);
 
         Task<IEnumerable<TaskCategoryEntity>> GetCategoriesAsync();
+
+        Task<bool> IsTaskCategoryExistAsync(int id);
     }
 }

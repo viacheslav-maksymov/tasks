@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Tasks.API.Helpers;
 using Tasks.API.Models.TaskStatus;
@@ -54,14 +53,15 @@ namespace Tasks.API.Controllers
 
         [HttpGet("{id}", Name = "GetTaskStatus")]
         public async Task<ActionResult<TaskStatusDto>> GetTaskStatus(int id)
-        {
-            TaskStatusEntity statusEntity = await this.repository.GetTaskStatusAsync(id);
+            => await this.HandleRequestAsync(async () =>
+            {
+                TaskStatusEntity statusEntity = await this.repository.GetTaskStatusAsync(id);
 
-            if (statusEntity is null)
-                return this.NotFound();
+                if (statusEntity is null)
+                    return this.NotFound();
 
-            return this.Ok(this.mapper.Map<TaskStatusDto>(statusEntity));
-        }
+                return this.Ok(this.mapper.Map<TaskStatusDto>(statusEntity));
+            }, this.logger);
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TaskStatusDto>>> GetTaskStatuses()
@@ -70,7 +70,7 @@ namespace Tasks.API.Controllers
                 IEnumerable<TaskStatusEntity> statusEntities = await this.repository.GetTaskStatusesAsync();
 
                 return this.Ok(this.mapper.Map<IEnumerable<TaskStatusDto>>(statusEntities));
-            });
+            }, this.logger);
 
         public TaskStatusesController(ILogger<TaskStatusesController> logger, 
             ITaskStatusesRepository repository,
@@ -84,7 +84,7 @@ namespace Tasks.API.Controllers
         [HttpPut("{id}")]
         public ActionResult<IEnumerable<TaskStatusDto>> UpdateTaskStatus(int id, TaskStatusUpdateDto taskStatus)
         {
-            return this.NoContent();
+            throw new NotImplementedException();
         }
     }
 }

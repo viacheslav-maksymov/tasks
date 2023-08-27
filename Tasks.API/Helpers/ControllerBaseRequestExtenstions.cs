@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Tasks.API.Models.TaskStatus;
+using Tasks.API.Constants;
 
 namespace Tasks.API.Helpers
 {
     public static class ControllerBaseRequestExtenstions
     {
+        public static int GetClaimUserIdValue(this ControllerBase controller)
+            => int.Parse(controller.User.Claims.FirstOrDefault(claim => claim.Type == TokenClaims.IdClaim)?.Value);
+
         public async static Task<ActionResult> HandleRequestAsync(this ControllerBase controller, Func<Task<ActionResult>> function, ILogger? logger = null)
         {
             try

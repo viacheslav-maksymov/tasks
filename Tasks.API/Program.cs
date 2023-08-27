@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Tasks.API.Controllers.Authentication;
 using Tasks.API.Services;
 using Tasks.API.Services.Interfaces;
 using Tasks.Data.Interfaces;
@@ -12,14 +13,14 @@ using Tasks.Log.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers(options =>
 {
     options.ReturnHttpNotAcceptable = true;
-}).AddNewtonsoftJson()
+    options.Filters.Add(typeof(ValdiateUserIdFilter));
+})
+.AddNewtonsoftJson()
 .AddXmlDataContractSerializerFormatters();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<TaskDatabaseContext>(
@@ -38,6 +39,8 @@ builder.Services.AddScoped<ITaskCategoriesRepository, TaskCategoriesRepository>(
 builder.Services.AddScoped<ILogDatabaseRepository, MongoDbDatabase>();
 
 builder.Services.AddScoped<IPasswordHashHandler, PasswordHashHandler>();
+builder.Services.AddScoped<ITokenManager, TokenManager>();
+builder.Services.AddScoped<ValdiateUserIdFilter>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -83,6 +86,7 @@ app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
+
     endpoints.MapControllers();
 });
 

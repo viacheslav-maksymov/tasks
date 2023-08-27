@@ -1,4 +1,4 @@
-﻿namespace Tasks.API.Controllers.Authentication
+﻿namespace Tasks.API.Models.Authentication
 {
     public sealed class AuthenticationRequestBody
     {

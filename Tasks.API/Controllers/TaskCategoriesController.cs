@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Tasks.API.Controllers.Authentication;
 using Tasks.API.Helpers;
 using Tasks.API.Models.Category;
-using Tasks.API.Models.Task;
 using Tasks.Data.Interfaces;
 using Tasks.Data.Models;
 
@@ -11,6 +11,7 @@ namespace Tasks.API.Controllers
 {
     [ApiController]
     [Authorize]
+    [TypeFilter(typeof(ValdiateUserIdFilter))]
     [Route("api/taskCategories")]
     public sealed class TaskCategoriesController : ControllerBase
     {
@@ -30,7 +31,7 @@ namespace Tasks.API.Controllers
         }
 
         [HttpGet()]
-        public async Task<ActionResult<IEnumerable<TaskCategoryDto>>> GetTasks()
+        public async Task<ActionResult<IEnumerable<TaskCategoryDto>>> GetTaskCategories()
             => await this.HandleRequestAsync(async () =>
             {
                 IEnumerable<TaskCategoryEntity> taskCategoryEntities = await this.repository.GetCategoriesAsync();
@@ -39,7 +40,7 @@ namespace Tasks.API.Controllers
             });
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<TaskCategoryDto>> GetTask(int id)
+        public async Task<ActionResult<TaskCategoryDto>> GetTaskCategory(int id)
             => await this.HandleRequestAsync(async () =>
             {
                 TaskCategoryEntity? taskCategoryEntity = await this.repository.GetTaskCategoryAsync(id);

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using Tasks.API.Controllers.Authentication;
 using Tasks.API.Helpers;
 using Tasks.API.Models.Task;
 using Tasks.API.Models.TaskStatus;
@@ -13,6 +15,7 @@ namespace Tasks.API.Controllers
 {
     [ApiController]
     [Authorize]
+    [TypeFilter(typeof(ValdiateUserIdFilter))]
     [Route("api")]
     public sealed class TasksController : ControllerBase
     {
@@ -26,12 +29,15 @@ namespace Tasks.API.Controllers
 
         private readonly ITaskStatusesRepository taskStatusesRepository;
 
+        private readonly ITaskCategoriesRepository taskCategoriesRepository;
+
         private readonly ILogDatabaseRepository logRepository;
 
         public TasksController(ILogger<TasksController> logger,
             ITasksRepository repository, 
             IUsersRepository userRepository,
             ITaskStatusesRepository taskStatusesRepository,
+            ITaskCategoriesRepository taskCategoriesRepository,
             IMapper mapper,
             ILogDatabaseRepository logRepository)
         {
@@ -40,6 +46,7 @@ namespace Tasks.API.Controllers
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             this.userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             this.taskStatusesRepository = taskStatusesRepository ?? throw new ArgumentNullException(nameof(taskStatusesRepository));
+            this.taskCategoriesRepository = taskCategoriesRepository ?? throw new ArgumentNullException(nameof(taskCategoriesRepository));
             this.logRepository = logRepository ?? throw new ArgumentNullException(nameof(logRepository));
         }
 
@@ -47,14 +54,17 @@ namespace Tasks.API.Controllers
         public async Task<ActionResult<TaskStatusDto>> CreateTask(TaskCreateDto task)
             => await this.HandleRequestAsync(async () =>
             {
-                if (!await this.userRepository.IsUserExistAsync(task.UserId))
-                    return this.NotFound();
+                int currentUserId = this.GetClaimUserIdValue();
+                if (currentUserId != task.UserId)
+                    return this.Forbid();
 
                 if (task.StatusId != null && !await this.taskStatusesRepository.IsTaskStatusExistAsync((int)task.StatusId))
-                    return this.NotFound();
+                    return this.NotFound($"The {nameof(task.StatusId)}: {task.StatusId} doesn't exist.");
+
+                if (task.CategoryId != null && !await this.taskCategoriesRepository.IsTaskCategoryExistAsync((int)task.CategoryId))
+                    return this.NotFound($"The {nameof(task.CategoryId)}: {task.CategoryId} doesn't exist.");
 
                 TaskEntity taskEntity = this.mapper.Map<TaskEntity>(task);
-
                 taskEntity.Date = DateTime.Now;
 
                 await this.repository.AddTaskAsync(taskEntity);
@@ -78,6 +88,10 @@ namespace Tasks.API.Controllers
                 if (taskEntity is null)
                     return this.NotFound();
 
+                int currentUserId = this.GetClaimUserIdValue();
+                if (currentUserId != taskEntity.UserId)
+                    return this.Forbid();
+
                 await this.repository.DeleteTaskAsync(taskEntity);
 
                 return this.NoContent();
@@ -87,7 +101,9 @@ namespace Tasks.API.Controllers
         public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasks()
             => await this.HandleRequestAsync(async () =>
             {
-                IEnumerable<TaskEntity> taskEntitites = await this.repository.GetTasksAsync();
+                int currentUserId = this.GetClaimUserIdValue();
+
+                IEnumerable<TaskEntity> taskEntitites = await this.repository.GetTasksByUserAsync(currentUserId);
 
                 return this.Ok(this.mapper.Map<IEnumerable<TaskDto>>(taskEntitites));
             });
@@ -101,6 +117,10 @@ namespace Tasks.API.Controllers
                 if (taskEntity is null)
                     return this.NotFound();
 
+                int currentUserId = this.GetClaimUserIdValue();
+                if (currentUserId != taskEntity.UserId)
+                    return this.Forbid();
+
                 return this.Ok(this.mapper.Map<TaskDto>(taskEntity));
             });
 
@@ -108,7 +128,9 @@ namespace Tasks.API.Controllers
         public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasksByStatus(int statusId)
             => await this.HandleRequestAsync(async () =>
             {
-                IEnumerable<TaskEntity> taskEntitites = await this.repository.GetTasksAsync();
+                int currentUserId = this.GetClaimUserIdValue();
+
+                IEnumerable<TaskEntity> taskEntitites = await this.repository.GetTasksByUserAsync(currentUserId);
 
                 IEnumerable<TaskEntity> taskWithStatus = taskEntitites.Where(task => task.StatusId == statusId);
 
@@ -118,18 +140,6 @@ namespace Tasks.API.Controllers
                 return this.Ok(this.mapper.Map<IEnumerable<TaskDto>>(taskWithStatus));
             });
 
-        [HttpGet("users/{userId}/tasks")]
-        public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasksByUser(int userId)
-            => await this.HandleRequestAsync(async () =>
-            {
-                if (!await this.userRepository.IsUserExistAsync(userId))
-                    return this.NotFound();
-
-                IEnumerable<TaskEntity> taskEntitites = await this.repository.GetTasksByUserAsync(userId);
-
-                return this.Ok(this.mapper.Map<IEnumerable<TaskDto>>(taskEntitites));
-            });
-
         [HttpPut("tasks/{id}")]
         public async Task<ActionResult> UpdateTask(int id, TaskUpdateDto task)
         {
@@ -137,6 +147,10 @@ namespace Tasks.API.Controllers
                 return this.NotFound();
 
             TaskEntity taskEntity = await this.repository.GetTaskAsync(id);
+
+            int currentUserId = this.GetClaimUserIdValue();
+            if (currentUserId != taskEntity.UserId)
+                return this.Forbid();
 
             taskEntity.Title = task.Title;
             taskEntity.Description = task.Description;

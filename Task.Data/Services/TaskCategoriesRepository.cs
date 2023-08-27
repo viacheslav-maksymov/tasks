@@ -17,5 +17,8 @@ namespace Tasks.Data.Services
         public async Task<IEnumerable<TaskCategoryEntity>> GetCategoriesAsync()
             => await this.context.TaskCategories
             .ToListAsync();
+
+        public async Task<bool> IsTaskCategoryExistAsync(int id)
+            => await this.context.TaskCategories.AnyAsync(status => status.CategoryId == id);
     }
 }

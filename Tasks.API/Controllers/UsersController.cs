@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using Tasks.API.Controllers.Authentication;
 using Tasks.API.Helpers;
 using Tasks.API.Models.User;
 using Tasks.API.Services.Interfaces;
@@ -11,6 +11,7 @@ using Tasks.Data.Models;
 namespace Tasks.API.Controllers
 {
     [ApiController]
+    [TypeFilter(typeof(ValdiateUserIdFilter))]
     [Route("api/users")]
     public sealed class UsersController : ControllerBase
     {
@@ -33,6 +34,7 @@ namespace Tasks.API.Controllers
             this.passwordHashHandler = passwordHashHandler ?? throw new ArgumentNullException(nameof(passwordHashHandler));
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<UserDto>> CreateUser(UserCreateDto user)
             => await this.HandleRequestAsync(async () =>
@@ -54,27 +56,10 @@ namespace Tasks.API.Controllers
             }, this.logger);
 
         [Authorize]
-        [HttpGet("{id}", Name = "GetUser")]
-        public async Task<ActionResult<UserDto>> GetUser(int id)
-        {
-            int currentUserId = int.Parse(this.User.Claims.FirstOrDefault(claim => claim.Type == "id")?.Value);
-
-            if (currentUserId != id)
-                return this.Forbid();
-
-            UserEntity userEntity = await this.repository.GetUserAsync(id);
-
-            if (userEntity is null)
-                return this.NotFound();
-
-            return this.Ok(this.mapper.Map<UserDto>(userEntity));
-        }
-
-        [Authorize]
         [HttpGet()]
         public async Task<ActionResult<UserDto>> GetUser()
         {
-            int currentUserId = int.Parse(this.User.Claims.FirstOrDefault(claim => claim.Type == "id")?.Value);
+            int currentUserId = this.GetClaimUserIdValue();
 
             UserEntity userEntity = await this.repository.GetUserAsync(currentUserId);
 

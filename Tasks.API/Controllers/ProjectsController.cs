@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Tasks.API.Controllers.Authentication;
 using Tasks.Data.Interfaces;
 
 namespace Tasks.API.Controllers
 {
     [ApiController]
     [Authorize]
+    [TypeFilter(typeof(ValdiateUserIdFilter))]
     [Route("api/users")]
     public sealed class ProjectsController : ControllerBase
     {
