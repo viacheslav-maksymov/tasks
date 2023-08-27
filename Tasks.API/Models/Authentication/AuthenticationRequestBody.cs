@@ -1,9 +1,13 @@
-﻿namespace Tasks.API.Models.Authentication
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Tasks.API.Models.Authentication
 {
     public sealed class AuthenticationRequestBody
     {
-        public string? UserName { get; set; }
+        [Required]
+        public string? Email { get; set; }
 
+        [Required]
         public string? Password { get; set; }
     }
 }

@@ -8,11 +8,11 @@ namespace Tasks.API.Controllers.Authentication
 {
     public sealed class ValdiateUserIdFilter : IAsyncAuthorizationFilter
     {
-        private readonly IUsersRepository usersRepository;
+        private readonly IUsersRepository repository;
 
-        public ValdiateUserIdFilter(IUsersRepository usersRepository)
+        public ValdiateUserIdFilter(IUsersRepository repository)
         {
-            this.usersRepository = usersRepository ?? throw new ArgumentNullException(nameof(usersRepository));
+            this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
@@ -32,7 +32,7 @@ namespace Tasks.API.Controllers.Authentication
 
             int userId = int.Parse(userIdClaim.Value);
 
-            if (!await this.usersRepository.IsUserExistAsync(userId))
+            if (!await this.repository.IsUserExistAsync(userId))
             {
                 context.Result = new UnauthorizedResult();
                 return;

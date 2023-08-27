@@ -13,7 +13,7 @@ namespace Tasks.Data.Models
 
         [Key]
         public int CategoryId { get; set; }
-        public string? CategoryName { get; set; } = null!;
+        public string CategoryName { get; set; } = null!;
 
         public virtual ICollection<TaskEntity> Tasks { get; set; }
     }

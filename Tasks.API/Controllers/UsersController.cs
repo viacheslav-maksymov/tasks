@@ -19,18 +19,22 @@ namespace Tasks.API.Controllers
 
         private readonly IUsersRepository repository;
 
+        private readonly ISystemUsersRepository systemUsersRepository;
+
         private readonly IMapper mapper;
 
         private readonly IPasswordHashHandler passwordHashHandler;
 
         public UsersController(ILogger<UsersController> logger,
             IUsersRepository repository,
+            ISystemUsersRepository systemUsersRepository,
             IMapper mapper,
             IPasswordHashHandler passwordHashHandler)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            this.repository = repository ?? throw new ArgumentNullException(nameof(logger));
-            this.mapper = mapper ?? throw new ArgumentNullException(nameof(logger));
+            this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            this.systemUsersRepository = systemUsersRepository ?? throw new ArgumentNullException(nameof(systemUsersRepository));
+            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             this.passwordHashHandler = passwordHashHandler ?? throw new ArgumentNullException(nameof(passwordHashHandler));
         }
 
@@ -39,11 +43,16 @@ namespace Tasks.API.Controllers
         public async Task<ActionResult<UserDto>> CreateUser(UserCreateDto user)
             => await this.HandleRequestAsync(async () =>
             {
+                if (await this.systemUsersRepository.IsEmailExistAsync(user.Email))
+                    return this.Conflict(new { error = "Email already exists" });
+
                 UserEntity userEntity = this.mapper.Map<UserEntity>(user);
-
-                userEntity.PasswordHash = this.passwordHashHandler.GetPasswordHash(user.Password);
-
                 await this.repository.AddUserAsync(userEntity);
+
+                SystemUserEntity systemUserEntity = this.mapper.Map<SystemUserEntity>(user);
+                systemUserEntity.PasswordHash = this.passwordHashHandler.GetPasswordHash(systemUserEntity.PasswordHash);
+                systemUserEntity.UserId = userEntity.UserId;
+                await this.systemUsersRepository.AddSystemUserAsync(systemUserEntity);
 
                 UserDto userDtoToReturn = this.mapper.Map<UserDto>(userEntity);
 
@@ -54,6 +63,7 @@ namespace Tasks.API.Controllers
                     },
                     userDtoToReturn);
             }, this.logger);
+
 
         [Authorize]
         [HttpGet()]

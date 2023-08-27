@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tasks.Data.Models
 {
-    public partial class TaskPriorityEntity
+    public partial class TaskPriority
     {
-        public TaskPriorityEntity()
+        public TaskPriority()
         {
             this.Tasks = new HashSet<TaskEntity>();
         }

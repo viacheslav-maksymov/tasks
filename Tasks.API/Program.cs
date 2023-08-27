@@ -33,6 +33,7 @@ builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 
 builder.Services.AddScoped<ITaskStatusesRepository, TaskStatusesRepository>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<ISystemUsersRepository, SystemUsersRepository>();
 builder.Services.AddScoped<ITasksRepository, TasksRepository>(); 
 builder.Services.AddScoped<ITaskCategoriesRepository, TaskCategoriesRepository>();
 

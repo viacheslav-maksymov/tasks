@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Tasks.Data.Models
 {
@@ -17,12 +19,13 @@ namespace Tasks.Data.Models
         public virtual DbSet<AttachmentEntity> Attachments { get; set; } = null!;
         public virtual DbSet<CommentEntity> Comments { get; set; } = null!;
         public virtual DbSet<ProjectEntity> Projects { get; set; } = null!;
-        public virtual DbSet<ProjectStatusEntity> ProjectStatuses { get; set; } = null!;
-        public virtual DbSet<RoleEntity> Roles { get; set; } = null!;
+        public virtual DbSet<ProjectStatus> ProjectStatuses { get; set; } = null!;
+        public virtual DbSet<Role> Roles { get; set; } = null!;
+        public virtual DbSet<SystemUserEntity> SystemUsers { get; set; } = null!;
         public virtual DbSet<TagEntity> Tags { get; set; } = null!;
         public virtual DbSet<TaskEntity> Tasks { get; set; } = null!;
         public virtual DbSet<TaskCategoryEntity> TaskCategories { get; set; } = null!;
-        public virtual DbSet<TaskPriorityEntity> TaskPriorities { get; set; } = null!;
+        public virtual DbSet<TaskPriority> TaskPriorities { get; set; } = null!;
         public virtual DbSet<TaskStatusEntity> TaskStatuses { get; set; } = null!;
         public virtual DbSet<UserEntity> Users { get; set; } = null!;
         public virtual DbSet<UserSettingEntity> UserSettings { get; set; } = null!;
@@ -83,9 +86,16 @@ namespace Tasks.Data.Models
                 entity.Property(e => e.ProjectName).HasMaxLength(100);
 
                 entity.Property(e => e.StartDate).HasColumnType("datetime");
+
+                entity.Property(e => e.StatusId).HasColumnName("StatusID");
+
+                entity.HasOne(d => d.Status)
+                    .WithMany(p => p.Projects)
+                    .HasForeignKey(d => d.StatusId)
+                    .HasConstraintName("FK_Project_ProjectStatuses");
             });
 
-            modelBuilder.Entity<ProjectStatusEntity>(entity =>
+            modelBuilder.Entity<ProjectStatus>(entity =>
             {
                 entity.HasKey(e => e.StatusId)
                     .HasName("PK__ProjectS__C8EE2043F23479E5");
@@ -95,11 +105,29 @@ namespace Tasks.Data.Models
                 entity.Property(e => e.StatusName).HasMaxLength(50);
             });
 
-            modelBuilder.Entity<RoleEntity>(entity =>
+            modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.RoleId).HasColumnName("RoleID");
 
                 entity.Property(e => e.RoleName).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<SystemUserEntity>(entity =>
+            {
+                entity.ToTable("SystemUser");
+
+                entity.Property(e => e.SystemUserId).HasColumnName("SystemUserID");
+
+                entity.Property(e => e.Email).HasMaxLength(50);
+
+                entity.Property(e => e.PasswordHash).HasMaxLength(128);
+
+                entity.Property(e => e.UserId).HasColumnName("UserID");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.SystemUsers)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_SystemUser_Users");
             });
 
             modelBuilder.Entity<TagEntity>(entity =>
@@ -216,7 +244,7 @@ namespace Tasks.Data.Models
                 entity.Property(e => e.CategoryName).HasMaxLength(50);
             });
 
-            modelBuilder.Entity<TaskPriorityEntity>(entity =>
+            modelBuilder.Entity<TaskPriority>(entity =>
             {
                 entity.HasKey(e => e.PriorityId)
                     .HasName("PK__TaskPrio__D0A3D0DE1DC0109B");
@@ -231,6 +259,9 @@ namespace Tasks.Data.Models
                 entity.HasKey(e => e.StatusId)
                     .HasName("PK__TaskStat__C8EE2043928E9874");
 
+                entity.HasIndex(e => e.StatusOrder, "UC_StatusOrder")
+                    .IsUnique();
+
                 entity.Property(e => e.StatusId).HasColumnName("StatusID");
 
                 entity.Property(e => e.StatusName).HasMaxLength(50);
@@ -239,10 +270,6 @@ namespace Tasks.Data.Models
             modelBuilder.Entity<UserEntity>(entity =>
             {
                 entity.Property(e => e.UserId).HasColumnName("UserID");
-
-                entity.Property(e => e.Email).HasMaxLength(50);
-
-                entity.Property(e => e.PasswordHash).HasMaxLength(128);
 
                 entity.Property(e => e.UserName).HasMaxLength(50);
 
@@ -267,7 +294,7 @@ namespace Tasks.Data.Models
                     .WithMany(p => p.Users)
                     .UsingEntity<Dictionary<string, object>>(
                         "UserRole",
-                        l => l.HasOne<RoleEntity>().WithMany().HasForeignKey("RoleId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__UserRoles__RoleI__3C69FB99"),
+                        l => l.HasOne<Role>().WithMany().HasForeignKey("RoleId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__UserRoles__RoleI__3C69FB99"),
                         r => r.HasOne<UserEntity>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__UserRoles__UserI__3B75D760"),
                         j =>
                         {

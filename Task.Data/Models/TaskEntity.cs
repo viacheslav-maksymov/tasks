@@ -27,7 +27,7 @@ namespace Tasks.Data.Models
         public int? ProjectId { get; set; }
 
         public virtual TaskCategoryEntity? Category { get; set; }
-        public virtual TaskPriorityEntity? Priority { get; set; }
+        public virtual TaskPriority? Priority { get; set; }
         public virtual ProjectEntity? Project { get; set; }
         public virtual TaskStatusEntity? Status { get; set; }
         public virtual UserEntity? User { get; set; }

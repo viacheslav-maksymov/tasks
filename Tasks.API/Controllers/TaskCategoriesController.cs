@@ -15,13 +15,13 @@ namespace Tasks.API.Controllers
     [Route("api/taskCategories")]
     public sealed class TaskCategoriesController : ControllerBase
     {
-        private readonly ILogger<TasksController> logger;
+        private readonly ILogger<TaskCategoriesController> logger;
 
         private readonly ITaskCategoriesRepository repository;
 
         private readonly IMapper mapper;
 
-        public TaskCategoriesController(ILogger<TasksController> logger,
+        public TaskCategoriesController(ILogger<TaskCategoriesController> logger,
             ITaskCategoriesRepository repository,
             IMapper mapper)
         {

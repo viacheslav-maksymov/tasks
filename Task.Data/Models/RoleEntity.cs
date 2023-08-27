@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tasks.Data.Models
 {
-    public partial class RoleEntity
+    public partial class Role
     {
-        public RoleEntity()
+        public Role()
         {
             this.Users = new HashSet<UserEntity>();
         }

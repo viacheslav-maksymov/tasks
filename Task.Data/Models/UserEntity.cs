@@ -9,24 +9,24 @@ namespace Tasks.Data.Models
         public UserEntity()
         {
             this.Comments = new HashSet<CommentEntity>();
+            this.SystemUsers = new HashSet<SystemUserEntity>();
             this.Tasks = new HashSet<TaskEntity>();
             this.UserSettings = new HashSet<UserSettingEntity>();
             this.Projects = new HashSet<ProjectEntity>();
-            this.Roles = new HashSet<RoleEntity>();
+            this.Roles = new HashSet<Role>();
         }
 
         [Key]
         public int UserId { get; set; }
         public string UserName { get; set; } = null!;
-        public string Email { get; set; } = null!;
-        public string PasswordHash { get; set; } = null!;
         public bool IsEmailConfirmed { get; set; }
 
         public virtual ICollection<CommentEntity> Comments { get; set; }
+        public virtual ICollection<SystemUserEntity> SystemUsers { get; set; }
         public virtual ICollection<TaskEntity> Tasks { get; set; }
         public virtual ICollection<UserSettingEntity> UserSettings { get; set; }
 
         public virtual ICollection<ProjectEntity> Projects { get; set; }
-        public virtual ICollection<RoleEntity> Roles { get; set; }
+        public virtual ICollection<Role> Roles { get; set; }
     }
 }

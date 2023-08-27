@@ -12,18 +12,18 @@ namespace Tasks.API.Controllers.Authentication
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly IUsersRepository repository;
+        private readonly ISystemUsersRepository repository;
 
         private readonly IPasswordHashHandler passwordHashHandler;
 
         private readonly ITokenManager tokenManager;
 
-        private readonly ILogger logger;
+        private readonly ILogger<AuthenticationController> logger;
 
-        public AuthenticationController(IUsersRepository repository,
+        public AuthenticationController(ISystemUsersRepository repository,
             IPasswordHashHandler passwordHashHandler,
             ITokenManager tokenManager,
-            ILogger logger)
+            ILogger<AuthenticationController> logger)
         {
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
             this.passwordHashHandler = passwordHashHandler ?? throw new ArgumentNullException(nameof(passwordHashHandler));
@@ -36,20 +36,21 @@ namespace Tasks.API.Controllers.Authentication
         public async Task<ActionResult<string>> Authenticate(AuthenticationRequestBody requestBody)
             => await this.HandleRequestAsync(async () =>
             {
-                if (!await this.repository.IsUserExistAsync(requestBody.UserName))
+                SystemUserEntity systemUser = await this.repository.GetSystemUserAsync(requestBody.Email);
+
+                if (systemUser == null)
                     return this.NotFound();
 
-                UserEntity user = await this.repository.GetUserAsync(requestBody.UserName);
-
-                if (!this.ValidateUserCredentials(user, requestBody.Password))
+                if (!this.ValidateUserCredentials(systemUser, requestBody.Password))
                     return this.Unauthorized();
 
-                string token = this.tokenManager.GetToken(user.UserId.ToString(), user.Email);
+                string token = this.tokenManager.GetToken(systemUser.UserId.ToString(), systemUser.Email);
 
                 return this.Ok(new { token = token });
             }, this.logger);
 
-        private bool ValidateUserCredentials(UserEntity user, string? password)
-            => this.passwordHashHandler.VerifyPassword(password, user?.PasswordHash);
+
+        private bool ValidateUserCredentials(SystemUserEntity systemUser, string? password)
+            => this.passwordHashHandler.VerifyPassword(password, systemUser?.PasswordHash);
     }
 }

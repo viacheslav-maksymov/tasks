@@ -27,7 +27,21 @@ namespace Tasks.API.Mapper
             this.CreateMap<ProjectEntity, ProjectDto>();
 
             this.CreateMap<UserEntity, UserDto>();
-            this.CreateMap<UserCreateDto, UserEntity>();
+            this.CreateMap<UserCreateDto, SystemUserEntity>()
+                .ForMember(dest => dest.SystemUserId, opt => opt.Ignore())
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password))
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.User, opt => opt.Ignore());
+            CreateMap<UserCreateDto, UserEntity>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.IsEmailConfirmed, opt => opt.Ignore())
+                .ForMember(dest => dest.Comments, opt => opt.Ignore()) 
+                .ForMember(dest => dest.Tasks, opt => opt.Ignore()) 
+                .ForMember(dest => dest.UserSettings, opt => opt.Ignore())
+                .ForMember(dest => dest.Projects, opt => opt.Ignore()) 
+                .ForMember(dest => dest.Roles, opt => opt.Ignore());
 
 
             this.CreateMap<TaskEntity, TaskUpdateLog>()
