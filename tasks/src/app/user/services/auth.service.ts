@@ -19,14 +19,11 @@ export class AuthService {
 
 
 
-  async login(username: string, password: string):Promise<boolean> {
-
+  async login(email: string, password: string):Promise<boolean> {
     let credentials = {
-      "userName": username,
+      "email": email,
       "password": password
     }
-
-    console.log('LOGIN')
 
     try {
       const response = await this.http.post<any>(`${this.apiUrl}/authentication/authenticate`, credentials).toPromise();

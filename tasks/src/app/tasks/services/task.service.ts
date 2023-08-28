@@ -18,7 +18,7 @@ export class TaskService {
     console.log('getTasksAsync')
     const userId = await this.userService.getUser().userId;
     console.log(userId)
-    const response = await this.http.get<ITask[]>(`${this.apiUrl}/users/${userId}/tasks`).toPromise();
+    const response = await this.http.get<ITask[]>(`${this.apiUrl}/tasks`).toPromise();
     console.log(response)
     return response;
   }

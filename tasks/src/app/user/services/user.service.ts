@@ -34,7 +34,7 @@ import { AuthService } from "./auth.service";
         email: email,
         password: password
       };
-    
+
       try {
         const response = await this.http.post<IUser>(`${this.apiUrl}/users`, registerData).toPromise();
         console.log(response)
