@@ -5,7 +5,8 @@ using Tasks.API.Controllers.Authentication;
 using Tasks.API.Helpers;
 using Tasks.API.Models.User;
 using Tasks.API.Services.Interfaces;
-using Tasks.Data.Interfaces;
+using Tasks.Data.Constants;
+using Tasks.Data.Interfaces.Repositories;
 using Tasks.Data.Models;
 
 namespace Tasks.API.Controllers
@@ -21,12 +22,15 @@ namespace Tasks.API.Controllers
 
         private readonly ISystemUsersRepository systemUsersRepository;
 
+        private readonly IRolesRepository rolesRepository;
+
         private readonly IMapper mapper;
 
         private readonly IPasswordHashHandler passwordHashHandler;
 
         public UsersController(ILogger<UsersController> logger,
             IUsersRepository repository,
+            IRolesRepository rolesRepository,
             ISystemUsersRepository systemUsersRepository,
             IMapper mapper,
             IPasswordHashHandler passwordHashHandler)
@@ -34,6 +38,7 @@ namespace Tasks.API.Controllers
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
             this.systemUsersRepository = systemUsersRepository ?? throw new ArgumentNullException(nameof(systemUsersRepository));
+            this.rolesRepository = rolesRepository ?? throw new ArgumentNullException(nameof(rolesRepository));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             this.passwordHashHandler = passwordHashHandler ?? throw new ArgumentNullException(nameof(passwordHashHandler));
         }
@@ -47,6 +52,8 @@ namespace Tasks.API.Controllers
                     return this.Conflict(new { error = "Email already exists" });
 
                 UserEntity userEntity = this.mapper.Map<UserEntity>(user);
+                RoleEntity role = await this.rolesRepository.GetNotConfirmedUserRoleAsync();
+                userEntity.Roles.Add(role);
                 await this.repository.AddUserAsync(userEntity);
 
                 SystemUserEntity systemUserEntity = this.mapper.Map<SystemUserEntity>(user);
@@ -66,7 +73,7 @@ namespace Tasks.API.Controllers
 
 
         [Authorize]
-        [HttpGet()]
+        [HttpGet(Name = "GetUser")]
         public async Task<ActionResult<UserDto>> GetUser()
              => await this.HandleRequestAsync(async () =>
              {

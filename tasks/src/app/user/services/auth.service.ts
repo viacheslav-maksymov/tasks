@@ -17,8 +17,6 @@ export class AuthService {
       this.authorizeAsync();
    }
 
-
-
   async login(email: string, password: string):Promise<boolean> {
     let credentials = {
       "email": email,
@@ -43,6 +41,7 @@ export class AuthService {
     try {
       response = await this.http.get<IUser>(`${this.apiUrl}/users`).toPromise()
       console.log('authorized user: ' + response)
+      console.log(await this.http.get(`${this.apiUrl}/users`).toPromise())
       this.userService.setUser(response)
       return true;
     }
@@ -81,6 +80,7 @@ export class AuthService {
   logout(): void {
     this.userService.clearUser();
     this.cookieService.delete('auth_token');
+    console.log('cleared auth_token')
   }
 
   updateUser(email:string) {

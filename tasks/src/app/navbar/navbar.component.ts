@@ -14,7 +14,7 @@ import { UserService } from "../user/services/user.service";
 })
 
 export class NavBarComponent{
-    constructor(public authService:AuthService, public userService: UserService) {
-        console.log()
+    constructor(public authService:AuthService, 
+        public userService: UserService) {
     }
 }

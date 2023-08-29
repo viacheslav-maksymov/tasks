@@ -16,16 +16,19 @@ namespace Tasks.API.Services
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public string GetToken(string userId, string email)
+        public string GetToken(string userId, string email, IEnumerable<string> roles)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(this.configuration["Authentication:Secret"]));
             var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claimsForToken = new List<Claim>
             {
-                new Claim(TokenClaims.IdClaim, userId),
-                new Claim(TokenClaims.EmailClaim, email),
+                new Claim(TokenClaimTypes.IdClaim, userId), 
+                new Claim(ClaimTypes.Email, email),
             };
+
+            foreach (string role in roles)
+                claimsForToken.Add(new Claim(ClaimTypes.Role, role));
 
             var jwtSecurityToken = new JwtSecurityToken(
                 this.configuration["Authentication:Issuer"],

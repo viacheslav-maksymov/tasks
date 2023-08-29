@@ -1,7 +1,7 @@
 ﻿using System;
 using Tasks.Data.Models;
 
-namespace Tasks.Data.Services
+namespace Tasks.Data.Services.Repositories
 {
     public abstract class RepositoryBase
     {

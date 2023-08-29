@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Tasks.API.Controllers.Authentication;
 using Tasks.API.Helpers;
 using Tasks.API.Models.Logs;
-using Tasks.Data.Interfaces;
+using Tasks.API.Services;
+using Tasks.Data.Constants;
+using Tasks.Data.Interfaces.Repositories;
 using Tasks.Data.Models;
 using Tasks.Log.Interfaces;
 using Tasks.Log.Models;
@@ -12,7 +14,7 @@ using Tasks.Log.Models;
 namespace Tasks.API.Controllers
 {
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = Roles.ConfirmedUser)]
     [TypeFilter(typeof(ValdiateUserIdFilter))]
     [Route("api")]
     public sealed class LogsController : ControllerBase

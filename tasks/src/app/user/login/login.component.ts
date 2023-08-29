@@ -12,7 +12,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 
 export class LoginComponent implements OnInit{
     loginForm:FormGroup;
-    private userName:FormControl
+    private email:FormControl
     private password:FormControl
     public isLoginError
 
@@ -20,18 +20,18 @@ export class LoginComponent implements OnInit{
     }
 
     ngOnInit() {
-        this.userName = new FormControl('', Validators.pattern("[a-zA-Z0-9]+"));
+        this.email = new FormControl('', Validators.pattern("[a-zA-Z0-9]+"));
         this.password = new FormControl('', Validators.pattern("[a-zA-Z0-9]+")) 
     
         this.loginForm = new FormGroup({
-          userName: this.userName,
+            email: this.email,
           password: this.password,
         })
       }
 
     login(formValues) {
         if (this.loginForm.valid) { 
-        let result = this.authService.login(this.userName.value, this.password.value).then(
+        let result = this.authService.login(this.email.value, this.password.value).then(
             result => {
                 if (result)
                 {

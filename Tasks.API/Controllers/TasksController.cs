@@ -6,7 +6,8 @@ using Tasks.API.Controllers.Authentication;
 using Tasks.API.Helpers;
 using Tasks.API.Models.Task;
 using Tasks.API.Models.TaskStatus;
-using Tasks.Data.Interfaces;
+using Tasks.Data.Constants;
+using Tasks.Data.Interfaces.Repositories;
 using Tasks.Data.Models;
 using Tasks.Log.Interfaces;
 using Tasks.Log.Models;
@@ -50,6 +51,7 @@ namespace Tasks.API.Controllers
             this.logRepository = logRepository ?? throw new ArgumentNullException(nameof(logRepository));
         }
 
+        [Authorize(Roles = Roles.ConfirmedUser)]
         [HttpPost("tasks")]
         public async Task<ActionResult<TaskStatusDto>> CreateTask(TaskCreateDto task)
             => await this.HandleRequestAsync(async () =>
@@ -79,6 +81,7 @@ namespace Tasks.API.Controllers
                     taskDtoToReturn);
             }, this.logger);
 
+        [Authorize(Roles = Roles.ConfirmedUser)]
         [HttpDelete("tasks/{id}")]
         public async Task<ActionResult> DeleteTask(int id)
             => await this.HandleRequestAsync(async () =>
@@ -140,33 +143,35 @@ namespace Tasks.API.Controllers
                 return this.Ok(this.mapper.Map<IEnumerable<TaskDto>>(taskWithStatus));
             }, this.logger);
 
+        [Authorize(Roles = Roles.ConfirmedUser)]
         [HttpPut("tasks/{id}")]
         public async Task<ActionResult> UpdateTask(int id, TaskUpdateDto task)
             => await this.HandleRequestAsync(async () =>
             {
-            if (!await this.repository.IsTaskExistAsync(id))
-                return this.NotFound();
+                if (!await this.repository.IsTaskExistAsync(id))
+                    return this.NotFound();
 
-            TaskEntity taskEntity = await this.repository.GetTaskAsync(id);
+                TaskEntity taskEntity = await this.repository.GetTaskAsync(id);
 
-            int currentUserId = this.GetClaimUserIdValue();
-            if (currentUserId != taskEntity.UserId)
-                return this.Forbid();
+                int currentUserId = this.GetClaimUserIdValue();
+                if (currentUserId != taskEntity.UserId)
+                    return this.Forbid();
 
-            taskEntity.Title = task.Title;
-            taskEntity.Description = task.Description;
-            taskEntity.CategoryId = task.CategoryId;
-            taskEntity.PriorityId = task.PriorityId;
-            taskEntity.ProjectId = task.ProjectId;
-            taskEntity.StatusId = task.StatusId;
+                taskEntity.Title = task.Title;
+                taskEntity.Description = task.Description;
+                taskEntity.CategoryId = task.CategoryId;
+                taskEntity.PriorityId = task.PriorityId;
+                taskEntity.ProjectId = task.ProjectId;
+                taskEntity.StatusId = task.StatusId;
 
-            await this.repository.UpdateTaskAsync(taskEntity);
+                await this.repository.UpdateTaskAsync(taskEntity);
+                taskEntity = await this.repository.GetTaskAsync(taskEntity.TaskId);
 
-            TaskUpdateLog log = this.mapper.Map<TaskUpdateLog>(taskEntity);
-            if (!await this.logRepository.FileUpdateTaskLogAsync(log))
-                this.logger.LogError($"Task update log not saved.\n{taskEntity.TaskId}");
+                TaskUpdateLog log = this.mapper.Map<TaskUpdateLog>(taskEntity);
+                if (!await this.logRepository.FileUpdateTaskLogAsync(log))
+                    this.logger.LogError($"Task update log not saved.\n{taskEntity.TaskId}");
 
-            return this.NoContent();
+                return this.NoContent();
         }, this.logger);
     }
 }

@@ -46,8 +46,6 @@ export class UpdateTaskComponent implements OnInit {
       this.statuses = await this.taskStatusService.getTaskStatuses().toPromise();
       this.categories = await this.taskCategoryService.getTaskCategories().toPromise();
 
-      console.log(this.task)
-
       this.taskForm.patchValue({
         title: this.task.title,
         description: this.task.description,
@@ -77,7 +75,7 @@ export class UpdateTaskComponent implements OnInit {
           if (result)
           {
             console.log(this.toastr)
-            //this.toastr.success('Task updated successfully', this.task.title)
+            this.toastr.success('Task updated successfully', this.task.title)
           }
         },
         error => {

@@ -6,8 +6,10 @@ using Tasks.API.Controllers.Authentication;
 using Tasks.API.Services;
 using Tasks.API.Services.Interfaces;
 using Tasks.Data.Interfaces;
+using Tasks.Data.Interfaces.Repositories;
 using Tasks.Data.Models;
 using Tasks.Data.Services;
+using Tasks.Data.Services.Repositories;
 using Tasks.Log.Data;
 using Tasks.Log.Interfaces;
 
@@ -28,7 +30,6 @@ builder.Services.AddDbContext<TaskDatabaseContext>(
         builder.Configuration["ConnectionStrings:TasksDBConnectionString"]));
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
 
-
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 
 builder.Services.AddScoped<ITaskStatusesRepository, TaskStatusesRepository>();
@@ -36,6 +37,7 @@ builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<ISystemUsersRepository, SystemUsersRepository>();
 builder.Services.AddScoped<ITasksRepository, TasksRepository>(); 
 builder.Services.AddScoped<ITaskCategoriesRepository, TaskCategoriesRepository>();
+builder.Services.AddScoped<IRolesRepository, RolesRepository>();
 
 builder.Services.AddScoped<ILogDatabaseRepository, MongoDbDatabase>();
 
@@ -44,6 +46,9 @@ builder.Services.AddScoped<ITokenManager, TokenManager>();
 builder.Services.AddScoped<ValdiateUserIdFilter>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddScoped<IDatabaseInitializer, DatabaseInitializer>();
+builder.Services.AddHostedService<DatabaseInitializationHostedService>();
 
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer(options =>

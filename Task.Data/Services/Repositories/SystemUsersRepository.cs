@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tasks.Data.Interfaces;
+using Tasks.Data.Interfaces.Repositories;
 using Tasks.Data.Models;
 
-namespace Tasks.Data.Services
+namespace Tasks.Data.Services.Repositories
 {
     public sealed class SystemUsersRepository : RepositoryBase, ISystemUsersRepository
     {

@@ -2,6 +2,7 @@
 using Tasks.API.Models.Category;
 using Tasks.API.Models.Logs;
 using Tasks.API.Models.Projects;
+using Tasks.API.Models.Roles;
 using Tasks.API.Models.Task;
 using Tasks.API.Models.TaskStatus;
 using Tasks.API.Models.User;
@@ -26,7 +27,15 @@ namespace Tasks.API.Mapper
 
             this.CreateMap<ProjectEntity, ProjectDto>();
 
-            this.CreateMap<UserEntity, UserDto>();
+            this.CreateMap<UserEntity, UserDto>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.SystemUsers.FirstOrDefault().Email))
+                .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.Roles));
+
+            this.CreateMap<RoleEntity, RoleDto>()
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.RoleName));
+
             this.CreateMap<UserCreateDto, SystemUserEntity>()
                 .ForMember(dest => dest.SystemUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))

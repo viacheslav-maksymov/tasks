@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Tasks.Data.Models
 {
-    public partial class Role
+    public partial class RoleEntity
     {
-        public Role()
+        public RoleEntity()
         {
             this.Users = new HashSet<UserEntity>();
         }

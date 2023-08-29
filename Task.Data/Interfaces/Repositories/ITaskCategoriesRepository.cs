@@ -1,6 +1,6 @@
 ﻿using Tasks.Data.Models;
 
-namespace Tasks.Data.Interfaces
+namespace Tasks.Data.Interfaces.Repositories
 {
     public interface ITaskCategoriesRepository
     {

@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tasks.API.Controllers.Authentication;
-using Tasks.Data.Interfaces;
+using Tasks.Data.Constants;
+using Tasks.Data.Interfaces.Repositories;
 
 namespace Tasks.API.Controllers
 {
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = Roles.ConfirmedUser)]
     [TypeFilter(typeof(ValdiateUserIdFilter))]
     [Route("api/users")]
     public sealed class ProjectsController : ControllerBase

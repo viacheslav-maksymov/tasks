@@ -5,7 +5,6 @@ import { userRoutes } from './user.routes';
 import { ProfileComponent } from "./profile/profile.component";
 import { LoginComponent } from "./login/login.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { UserService } from "./services/user.service";
 import { RegisterComponent } from "./register/register.component";
 
 
@@ -22,7 +21,6 @@ import { RegisterComponent } from "./register/register.component";
         RegisterComponent
     ],
     providers: [
-        UserService
     ]
 })
 

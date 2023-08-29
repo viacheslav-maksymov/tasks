@@ -20,7 +20,7 @@ namespace Tasks.Data.Models
         public virtual DbSet<CommentEntity> Comments { get; set; } = null!;
         public virtual DbSet<ProjectEntity> Projects { get; set; } = null!;
         public virtual DbSet<ProjectStatus> ProjectStatuses { get; set; } = null!;
-        public virtual DbSet<Role> Roles { get; set; } = null!;
+        public virtual DbSet<RoleEntity> Roles { get; set; } = null!;
         public virtual DbSet<SystemUserEntity> SystemUsers { get; set; } = null!;
         public virtual DbSet<TagEntity> Tags { get; set; } = null!;
         public virtual DbSet<TaskEntity> Tasks { get; set; } = null!;
@@ -105,7 +105,7 @@ namespace Tasks.Data.Models
                 entity.Property(e => e.StatusName).HasMaxLength(50);
             });
 
-            modelBuilder.Entity<Role>(entity =>
+            modelBuilder.Entity<RoleEntity>(entity =>
             {
                 entity.Property(e => e.RoleId).HasColumnName("RoleID");
 
@@ -294,7 +294,7 @@ namespace Tasks.Data.Models
                     .WithMany(p => p.Users)
                     .UsingEntity<Dictionary<string, object>>(
                         "UserRole",
-                        l => l.HasOne<Role>().WithMany().HasForeignKey("RoleId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__UserRoles__RoleI__3C69FB99"),
+                        l => l.HasOne<RoleEntity>().WithMany().HasForeignKey("RoleId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__UserRoles__RoleI__3C69FB99"),
                         r => r.HasOne<UserEntity>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__UserRoles__UserI__3B75D760"),
                         j =>
                         {

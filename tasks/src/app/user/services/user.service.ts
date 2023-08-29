@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, of } from "rxjs";
 import { environment } from "src/environments/environment";
-import { IAuthorizedUser } from "../models/user.model";
+import { IAuthorizedUser } from "../models/authorized-user.model";
 import { IUser } from "src/app/tasks/models/user.model";
 import { AuthService } from "./auth.service";
 
@@ -20,7 +20,9 @@ import { AuthService } from "./auth.service";
       let authorizedUser:IAuthorizedUser
 
       authorizedUser = {
-        userName: user.userName
+        userName: user.userName,
+        roles: user.roles,
+
       }
     }
   
@@ -35,6 +37,8 @@ import { AuthService } from "./auth.service";
         password: password
       };
 
+      console.log(registerData)
+
       try {
         const response = await this.http.post<IUser>(`${this.apiUrl}/users`, registerData).toPromise();
         console.log(response)
@@ -45,11 +49,10 @@ import { AuthService } from "./auth.service";
       }
     }
     
-
     clearUser() {
       this.currentUser = null;
+      console.log('cleared:' + this.currentUser)
     }
-
 
     private handeError<T> (operation = 'operation', result?: T) {
       return (error: any) : Observable<T> => {

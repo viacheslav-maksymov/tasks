@@ -13,7 +13,7 @@ namespace Tasks.Data.Models
             this.Tasks = new HashSet<TaskEntity>();
             this.UserSettings = new HashSet<UserSettingEntity>();
             this.Projects = new HashSet<ProjectEntity>();
-            this.Roles = new HashSet<Role>();
+            this.Roles = new HashSet<RoleEntity>();
         }
 
         [Key]
@@ -27,6 +27,6 @@ namespace Tasks.Data.Models
         public virtual ICollection<UserSettingEntity> UserSettings { get; set; }
 
         public virtual ICollection<ProjectEntity> Projects { get; set; }
-        public virtual ICollection<Role> Roles { get; set; }
+        public virtual ICollection<RoleEntity> Roles { get; set; }
     }
 }

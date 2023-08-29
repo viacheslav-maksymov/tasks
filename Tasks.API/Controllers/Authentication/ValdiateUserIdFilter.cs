@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Tasks.API.Constants;
-using Tasks.Data.Interfaces;
+using Tasks.Data.Interfaces.Repositories;
 
 namespace Tasks.API.Controllers.Authentication
 {
@@ -23,7 +23,7 @@ namespace Tasks.API.Controllers.Authentication
             if (hasAllowAnonymous)
                 return;
 
-            var userIdClaim = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == TokenClaims.IdClaim);
+            var userIdClaim = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == TokenClaimTypes.IdClaim);
             if (userIdClaim == null)
             {
                 context.Result = new UnauthorizedResult();

@@ -2,6 +2,6 @@
 {
     public interface ITokenManager
     {
-        string GetToken(string userId, string email);
+        string GetToken(string userId, string email, IEnumerable<string> roles);
     }
 }

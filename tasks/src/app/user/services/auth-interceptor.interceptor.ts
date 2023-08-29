@@ -9,7 +9,6 @@ import { CookieService } from 'ngx-cookie-service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-
   constructor(private router: Router, private cookieService: CookieService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -29,7 +28,15 @@ export class AuthInterceptor implements HttpInterceptor {
 
         if (error.status === 401) {
           this.router.navigate(['/user/login']);
-          localStorage.removeItem('user');
+          this.cookieService.delete('auth_token')
+        }
+
+        if (error.status === 403) {
+          this.router.navigate(['/403']);
+        }
+
+        if (error.status === 404) {
+          this.router.navigate(['/404']);
         }
 
         // Возвращаем Observable с ошибкой

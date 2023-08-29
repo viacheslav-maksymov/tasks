@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router'
 
 import { AppComponent } from './app.component';
 import { NavBarComponent } from './navbar/navbar.component';
+import { Error403Component } from './errors/403.component';
 import { Error404Component } from './errors/404.component';
 
 import { appRoutes } from './routes'
@@ -25,6 +26,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   declarations: [
     AppComponent,
     NavBarComponent,
+    Error403Component,
     Error404Component,
   ],
   providers: [

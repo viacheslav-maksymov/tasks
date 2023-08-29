@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tasks.API.Controllers.Authentication;
 using Tasks.API.Helpers;
 using Tasks.API.Models.Category;
-using Tasks.Data.Interfaces;
+using Tasks.Data.Interfaces.Repositories;
 using Tasks.Data.Models;
 
 namespace Tasks.API.Controllers

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tasks.API.Helpers;
 using Tasks.API.Models.TaskStatus;
-using Tasks.Data.Interfaces;
+using Tasks.Data.Interfaces.Repositories;
 using Tasks.Data.Models;
 
 namespace Tasks.API.Controllers

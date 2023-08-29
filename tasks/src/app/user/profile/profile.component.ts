@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { FormControl, FormGroup, Validators } from '@angular/forms'
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { AuthService } from '../services/auth.service'
 import { Router } from '@angular/router'
 import { UserService } from '../services/user.service'
@@ -14,22 +14,28 @@ import { UserService } from '../services/user.service'
 export class ProfileComponent implements OnInit {
   profileForm:FormGroup
   private userName:FormControl
-  private email:FormControl
 
   constructor(private router:Router, 
     private userService:UserService,
-    private authService:AuthService) {
-
+    private authService:AuthService,
+    private fb: FormBuilder) {
+      this.profileForm = this.fb.group({
+        userName: ['', Validators.required]
+    });
   }
 
   ngOnInit() {
-    this.userName = new FormControl(this.userService.getUser()?.userName, Validators.pattern("[a-zA-Z0-9]+"));
-    this.email = new FormControl(this.userService.getUser()?.email) 
+    try {
+      console.log(this.userService.getUser())
+      let user = this.userService.getUser();
+      this.userName = new FormControl(user.userName, Validators.pattern("[a-zA-Z0-9]+"));
 
-    this.profileForm = new FormGroup({
-      userName: this.userName,
-      email: this.email
-    })
+      this.profileForm.patchValue({
+        userName: user.userName
+      });
+  } catch (error) {
+    console.error(error);
+  }
   }
 
   cancel() {
@@ -37,7 +43,7 @@ export class ProfileComponent implements OnInit {
   }
 
   saveProfile(formValues) {
-    this.authService.updateUser(formValues.email)
+    this.authService.updateUser(formValues.userName)
     this.router.navigate(['tasks']);
   }
 
